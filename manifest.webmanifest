@@ -1,0 +1,17 @@
+{
+  "name": "Sonde — carnet de pêche",
+  "short_name": "Sonde",
+  "description": "Carnet de sorties de pêche : conditions relevées automatiquement, comparaison avec les sorties passées.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#08191F",
+  "theme_color": "#08191F",
+  "lang": "fr",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

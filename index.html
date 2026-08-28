@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#08191F">
+<title>Sonde — carnet de pêche</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+:root{
+  --fond:#08191F;
+  --panneau:#0E2730;
+  --panneau-haut:#143441;
+  --ligne:#1D4756;
+  --texte:#E4EDEA;
+  --doux:#7E9AA4;
+  --laiton:#C89B54;
+  --laiton-sourd:#4A3B22;
+  --alerte:#C4573F;
+  --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  --nav:calc(58px + env(safe-area-inset-bottom));
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--fond);color:var(--texte);font-family:var(--sans);
+  font-size:16px;line-height:1.45;padding-bottom:var(--nav);
+  -webkit-font-smoothing:antialiased;
+}
+/* ---- lignes de sonde : motif de fond ---- */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:repeating-linear-gradient(to bottom,transparent 0 47px,rgba(29,71,86,.28) 47px 48px);
+  mask-image:linear-gradient(to bottom,transparent,#000 220px);
+  -webkit-mask-image:linear-gradient(to bottom,transparent,#000 220px);
+}
+#app{position:relative;z-index:1;max-width:560px;margin:0 auto;padding:0 16px}
+
+header.top{padding:22px 0 14px;display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.marque{font-family:var(--mono);font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--laiton)}
+.vue-titre{font-size:26px;font-weight:600;letter-spacing:-.02em;margin:0}
+.sous{color:var(--doux);font-size:13.5px;margin:2px 0 0}
+
+label,.eyebrow{
+  display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--doux);margin:0 0 6px
+}
+input,select,textarea,button{font-family:inherit;font-size:16px;color:var(--texte)}
+input,select,textarea{
+  width:100%;background:var(--panneau);border:1px solid var(--ligne);
+  border-radius:3px;padding:11px 12px;appearance:none
+}
+select{background-image:linear-gradient(45deg,transparent 50%,var(--doux) 50%),linear-gradient(135deg,var(--doux) 50%,transparent 50%);
+  background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+textarea{min-height:76px;resize:vertical}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--laiton);outline-offset:1px}
+input[type=number]{font-family:var(--mono)}
+.champ{margin-bottom:15px}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.trio{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px}
+
+button{cursor:pointer;border-radius:3px;border:1px solid var(--ligne);background:var(--panneau-haut);padding:11px 14px}
+button:active{transform:translateY(1px)}
+.principal{
+  width:100%;background:var(--laiton);color:#14202A;border:none;font-weight:700;
+  padding:15px;letter-spacing:.02em;font-size:16.5px
+}
+.fantome{background:transparent;color:var(--doux);font-size:13.5px;padding:9px 11px}
+
+/* ---- bandeau instrument : l'élément signature ---- */
+.instrument{
+  background:var(--panneau);border:1px solid var(--ligne);border-left:3px solid var(--laiton);
+  border-radius:3px;padding:12px 13px;font-family:var(--mono);margin-bottom:15px
+}
+.instrument .lignes{display:flex;flex-wrap:wrap;gap:5px 16px;font-size:13.5px}
+.instrument .u{color:var(--doux);font-size:11px}
+.instrument .abs{color:var(--doux);font-size:12.5px;font-style:normal}
+.tendance{font-weight:700}
+.monte{color:#7FB8A0}.descend{color:var(--laiton)}.stable{color:var(--doux)}
+
+.carte{
+  background:var(--panneau);border:1px solid var(--ligne);border-radius:3px;
+  padding:13px;margin-bottom:11px
+}
+.carte-entete{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px}
+.carte h3{margin:0;font-size:16.5px;font-weight:600}
+.carte .quand{font-family:var(--mono);font-size:11.5px;color:var(--doux);letter-spacing:.04em}
+.prise{
+  font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.06em;
+  padding:3px 8px;border-radius:2px;white-space:nowrap
+}
+.prise.oui{background:var(--laiton);color:#14202A}
+.prise.non{background:transparent;color:var(--doux);border:1px solid var(--ligne)}
+.detail{font-size:14px;color:var(--texte);margin:0 0 6px}
+.detail .sep{color:var(--doux);margin:0 6px}
+.mini{font-family:var(--mono);font-size:11.5px;color:var(--doux);letter-spacing:.03em}
+.note{font-size:13.5px;color:var(--doux);margin:8px 0 0;font-style:italic}
+
+/* barre de correspondance */
+.match{display:flex;align-items:center;gap:9px;margin-top:9px}
+.match .barre{flex:1;height:3px;background:var(--laiton-sourd);border-radius:2px;overflow:hidden}
+.match .barre i{display:block;height:100%;background:var(--laiton)}
+.match .pct{font-family:var(--mono);font-size:11px;color:var(--laiton);letter-spacing:.05em}
+
+.vide{
+  border:1px dashed var(--ligne);border-radius:3px;padding:26px 18px;text-align:center;color:var(--doux)
+}
+.vide strong{display:block;color:var(--texte);font-size:17px;font-weight:600;margin-bottom:6px}
+
+nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:5;display:flex;
+  background:rgba(8,25,31,.94);backdrop-filter:blur(12px);
+  border-top:1px solid var(--ligne);padding-bottom:env(safe-area-inset-bottom)
+}
+nav button{
+  flex:1;background:none;border:none;border-radius:0;padding:11px 4px 12px;
+  font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--doux)
+}
+nav button[aria-current=page]{color:var(--laiton);box-shadow:inset 0 2px 0 var(--laiton)}
+
+.bandeau{
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;padding:9px 12px;
+  border-radius:3px;margin-bottom:14px;border:1px solid
+}
+.bandeau.avert{background:rgba(196,87,63,.12);border-color:rgba(196,87,63,.5);color:#E9A392}
+.bandeau.info{background:rgba(200,155,84,.09);border-color:var(--laiton-sourd);color:var(--laiton)}
+
+.toast{
+  position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--nav) + 14px);z-index:20;
+  background:var(--laiton);color:#14202A;font-family:var(--mono);font-size:12.5px;letter-spacing:.05em;
+  padding:11px 17px;border-radius:3px;font-weight:700;opacity:0;transition:opacity .2s;pointer-events:none
+}
+.toast.on{opacity:1}
+.outils{display:flex;gap:9px;margin:20px 0 4px}
+.outils button{flex:1}
+h2.sec{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--doux);margin:26px 0 11px;padding-bottom:7px;border-bottom:1px solid var(--ligne)
+}
+.stat{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--ligne);font-size:14.5px}
+.stat b{font-family:var(--mono);font-weight:700;color:var(--laiton)}
+.cache{display:none}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <div>
+      <div class="marque">Sonde</div>
+      <h1 class="vue-titre" id="titre">Nouvelle sortie</h1>
+      <p class="sous" id="soustitre"></p>
+    </div>
+  </header>
+  <div id="vue"></div>
+</div>
+
+<nav>
+  <button data-vue="sortie" aria-current="page">Sortie</button>
+  <button data-vue="journal">Journal</button>
+  <button data-vue="analyse">Analyse</button>
+</nav>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+
+/* ══════════ stockage ══════════ */
+const CLE = "sonde.v1";
+let persistant = true;
+let memoire = null;
+
+function lire(){
+  if(!persistant) return memoire || {sorties:[], spots:[]};
+  try{
+    const brut = localStorage.getItem(CLE);
+    return brut ? JSON.parse(brut) : {sorties:[], spots:[]};
+  }catch(e){
+    persistant = false;
+    return memoire || {sorties:[], spots:[]};
+  }
+}
+function ecrire(d){
+  memoire = d;
+  if(!persistant) return false;
+  try{ localStorage.setItem(CLE, JSON.stringify(d)); return true; }
+  catch(e){ persistant = false; return false; }
+}
+(function testerStockage(){
+  try{ localStorage.setItem("sonde.test","1"); localStorage.removeItem("sonde.test"); }
+  catch(e){ persistant = false; }
+})();
+
+let D = lire();
+
+/* ══════════ utilitaires ══════════ */
+const $ = s => document.querySelector(s);
+const vue = $("#vue");
+let vueActive = "sortie";
+
+function toast(txt){
+  const t = $("#toast"); t.textContent = txt; t.classList.add("on");
+  clearTimeout(t._t); t._t = setTimeout(()=>t.classList.remove("on"), 2400);
+}
+function ech(s){ return String(s==null?"":s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function id(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+function dateLocaleInput(d){
+  const p = n => String(n).padStart(2,"0");
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+function joliDate(iso){
+  const d = new Date(iso);
+  return d.toLocaleDateString("fr-FR",{weekday:"short",day:"numeric",month:"short"})
+       + " · " + d.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
+}
+function jourAnnee(d){
+  const deb = new Date(d.getFullYear(),0,0);
+  return Math.floor((d - deb) / 86400000);
+}
+function ecartJour(a,b){ const d = Math.abs(a-b); return Math.min(d, 365-d); }
+function ecartHeure(a,b){ const d = Math.abs(a-b); return Math.min(d, 24-d); }
+
+const CARDINAUX = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSO","SO","OSO","O","ONO","NO","NNO"];
+function cardinal(deg){ return deg==null ? "—" : CARDINAUX[Math.round(deg/22.5)%16]; }
+
+function phaseLune(d){
+  const synodique = 29.530588853;
+  const ref = Date.UTC(2000,0,6,18,14);
+  let age = ((d.getTime()-ref)/86400000) % synodique;
+  if(age < 0) age += synodique;
+  const f = age/synodique;
+  const noms = ["nouvelle lune","premier croissant","premier quartier","gibbeuse croissante",
+                "pleine lune","gibbeuse décroissante","dernier quartier","dernier croissant"];
+  const glyphes = ["🌑","🌒","🌓","🌔","🌕","🌖","🌗","🌘"];
+  const i = Math.floor(f*8 + 0.5) % 8;
+  return {nom:noms[i], glyphe:glyphes[i], illumination:Math.round((1-Math.cos(2*Math.PI*f))/2*100)};
+}
+
+/* ══════════ météo (Open-Meteo, sans clé) ══════════ */
+const VARIABLES = "temperature_2m,pressure_msl,cloud_cover,wind_speed_10m,wind_direction_10m,precipitation";
+
+async function chercherMeteo(lat, lon, quand){
+  const t = new Date(quand);
+  const jours = Math.ceil((Date.now() - t.getTime())/86400000);
+  let url;
+
+  if(jours > 88){
+    // Au-delà de trois mois, l'API de prévision ne remonte plus : on passe par l'archive.
+    const j = t.toISOString().slice(0,10);
+    const veille = new Date(t.getTime() - 86400000).toISOString().slice(0,10);
+    url = "https://archive-api.open-meteo.com/v1/archive"
+      + `?latitude=${lat.toFixed(4)}&longitude=${lon.toFixed(4)}`
+      + `&start_date=${veille}&end_date=${j}&hourly=${VARIABLES}&timezone=auto`;
+  } else {
+    const passe = Math.max(1, Math.min(92, jours + 1));
+    url = "https://api.open-meteo.com/v1/forecast"
+      + `?latitude=${lat.toFixed(4)}&longitude=${lon.toFixed(4)}`
+      + `&hourly=${VARIABLES}&past_days=${passe}&forecast_days=2&timezone=auto`;
+  }
+
+  const r = await fetch(url);
+  if(!r.ok) throw new Error("météo indisponible");
+  const j = await r.json();
+  const H = j.hourly;
+  if(!H || !H.time || !H.time.length) throw new Error("météo vide");
+
+  // heure la plus proche de la sortie
+  let iBest = 0, ecartBest = Infinity;
+  for(let i=0;i<H.time.length;i++){
+    const e = Math.abs(new Date(H.time[i]).getTime() - t.getTime());
+    if(e < ecartBest){ ecartBest = e; iBest = i; }
+  }
+  if(ecartBest > 6*3600*1000) throw new Error("hors plage");
+
+  const p = H.pressure_msl[iBest];
+  const p6 = iBest >= 6 ? H.pressure_msl[iBest-6] : null;
+
+  return {
+    temp: H.temperature_2m[iBest],
+    pression: p,
+    tendance: (p!=null && p6!=null) ? +(p - p6).toFixed(1) : null,
+    nuages: H.cloud_cover[iBest],
+    vent: H.wind_speed_10m[iBest],
+    ventDeg: H.wind_direction_10m[iBest],
+    pluie: H.precipitation[iBest],
+    lune: phaseLune(t)
+  };
+}
+
+function fleche(t){
+  if(t == null) return {c:"stable", s:"—"};
+  if(t >= 1.5) return {c:"monte", s:"↑ +" + t.toFixed(1)};
+  if(t <= -1.5) return {c:"descend", s:"↓ " + t.toFixed(1)};
+  return {c:"stable", s:"→ " + (t>0?"+":"") + t.toFixed(1)};
+}
+
+function bandeauInstrument(m, titre){
+  if(!m) return `<div class="instrument"><div class="abs">Météo non enregistrée — sera complétée à la prochaine connexion.</div></div>`;
+  const f = fleche(m.tendance);
+  return `<div class="instrument">
+    ${titre ? `<div class="eyebrow" style="margin-bottom:9px">${ech(titre)}</div>` : ""}
+    <div class="lignes">
+      <span>${m.pression!=null?Math.round(m.pression):"—"}<span class="u"> hPa</span>
+        <span class="tendance ${f.c}">${f.s}</span></span>
+      <span>${m.temp!=null?m.temp.toFixed(1):"—"}<span class="u"> °C</span></span>
+      <span>${cardinal(m.ventDeg)} ${m.vent!=null?Math.round(m.vent):"—"}<span class="u"> km/h</span></span>
+      <span>${m.nuages!=null?Math.round(m.nuages):"—"}<span class="u"> % nuages</span></span>
+      ${m.pluie!=null&&m.pluie>0?`<span>${m.pluie.toFixed(1)}<span class="u"> mm</span></span>`:""}
+      <span>${m.lune?m.lune.glyphe+" "+m.lune.illumination+"%":""}</span>
+    </div>
+  </div>`;
+}
+
+/* ══════════ file d'attente hors-ligne ══════════ */
+const MAX_TENTATIVES = 5;
+
+async function completerMeteoEnAttente(){
+  const restes = D.sorties.filter(s => !s.meteo && s.lat != null && (s.essais||0) < MAX_TENTATIVES);
+  if(!restes.length || !navigator.onLine) return;
+  let n = 0, bouge = false;
+  for(const s of restes.slice(0,10)){
+    try{ s.meteo = await chercherMeteo(s.lat, s.lon, s.quand); s.essais = 0; n++; bouge = true; }
+    catch(e){ s.essais = (s.essais||0) + 1; bouge = true; }
+  }
+  if(bouge) ecrire(D);
+  if(n){ if(vueActive !== "sortie") rendre(); toast(n + " sortie(s) complétée(s)"); }
+}
+window.addEventListener("online", completerMeteoEnAttente);
+
+/* ══════════ listes ══════════ */
+const EAUX = ["Rivière","Fleuve","Lac","Étang","Canal","Gravière","Réservoir","Mer / estuaire"];
+const TECHNIQUES = ["Lancer-ramener","Verticale","Drop shot","Texan","Carolina","Jig / casting","Mouche","Pêche au posé","Traîne","Pêche au coup","Autre"];
+const COUCHES = ["Surface","Entre deux eaux","Fond"];
+const ESPECES = ["Brochet","Sandre","Perche","Silure","Black-bass","Truite","Chevesne","Aspe","Carpe","Barbeau","Bar","Autre"];
+
+function opts(liste, choisi){
+  return liste.map(o => `<option value="${ech(o)}"${o===choisi?" selected":""}>${ech(o)}</option>`).join("");
+}
+
+/* ══════════ vue : nouvelle sortie ══════════ */
+function vueSortie(){
+  $("#titre").textContent = "Nouvelle sortie";
+  $("#soustitre").textContent = "Trente secondes, même bredouille.";
+
+  const avert = !persistant
+    ? `<div class="bandeau avert">Stockage indisponible ici — les sorties ne seront pas conservées. Déploie la page en ligne pour l'utiliser pour de vrai.</div>` : "";
+  const attente = D.sorties.filter(s=>!s.meteo && s.lat!=null).length;
+  const infoAttente = attente
+    ? `<div class="bandeau info">${attente} sortie(s) en attente de météo — complétée dès le retour du réseau.</div>` : "";
+
+  vue.innerHTML = avert + infoAttente + `
+  <form id="f" novalidate>
+    <div class="champ">
+      <label for="quand">Date et heure</label>
+      <input type="datetime-local" id="quand" value="${dateLocaleInput(new Date())}">
+    </div>
+
+    <div class="champ">
+      <label for="spot">Spot</label>
+      <input type="text" id="spot" placeholder="Le pont du moulin" list="spots" autocomplete="off">
+      <datalist id="spots">${D.spots.map(s=>`<option value="${ech(s.nom)}">`).join("")}</datalist>
+      <button type="button" class="fantome" id="geo" style="margin-top:8px">📍 Relever ma position</button>
+      <div class="mini" id="posInfo" style="margin-top:6px"></div>
+    </div>
+
+    <div class="duo champ">
+      <div><label for="eau">Type d'eau</label><select id="eau">${opts(EAUX)}</select></div>
+      <div><label for="duree">Durée (h)</label><input type="number" id="duree" step="0.5" min="0" placeholder="2"></div>
+    </div>
+
+    <h2 class="sec">Ce que tu as fait</h2>
+    <div class="duo champ">
+      <div><label for="tech">Technique</label><select id="tech">${opts(TECHNIQUES)}</select></div>
+      <div><label for="couche">Couche d'eau</label><select id="couche">${opts(COUCHES)}</select></div>
+    </div>
+    <div class="champ">
+      <label for="leurre">Leurre / montage</label>
+      <input type="text" id="leurre" placeholder="Shad 10 cm, tête plombée 14 g">
+    </div>
+    <div class="duo champ">
+      <div><label for="coloris">Coloris</label><input type="text" id="coloris" placeholder="Ayu"></div>
+      <div><label for="eauCouleur">Couleur de l'eau</label>
+        <select id="eauCouleur">${opts(["Claire","Légèrement teintée","Teintée","Trouble"])}</select></div>
+    </div>
+
+    <h2 class="sec">Résultat</h2>
+    <div class="trio champ">
+      <div><label for="nb">Prises</label><input type="number" id="nb" min="0" value="0"></div>
+      <div><label for="espece">Espèce</label><select id="espece"><option value="">—</option>${opts(ESPECES)}</select></div>
+      <div><label for="taille">Max (cm)</label><input type="number" id="taille" min="0" placeholder=""></div>
+    </div>
+    <div class="champ">
+      <label for="notes">Notes</label>
+      <textarea id="notes" placeholder="Touches en fin de dérive, poisson collé au bois immergé…"></textarea>
+    </div>
+
+    <button type="submit" class="principal">Enregistrer la sortie</button>
+  </form>`;
+
+  let lat = null, lon = null;
+
+  $("#geo").addEventListener("click", () => {
+    const info = $("#posInfo");
+    if(!navigator.geolocation){ info.textContent = "Géolocalisation non disponible sur cet appareil."; return; }
+    info.textContent = "Relevé en cours…";
+    navigator.geolocation.getCurrentPosition(p => {
+      lat = p.coords.latitude; lon = p.coords.longitude;
+      info.textContent = `${lat.toFixed(5)}, ${lon.toFixed(5)} · ±${Math.round(p.coords.accuracy)} m`;
+      const proche = spotLePlusProche(lat, lon, 300);
+      if(proche && !$("#spot").value){ $("#spot").value = proche.nom; toast("Spot reconnu : " + proche.nom); }
+    }, err => {
+      info.textContent = "Position refusée ou indisponible. Tu peux enregistrer sans — la météo sera manquante.";
+    }, {enableHighAccuracy:true, timeout:12000, maximumAge:60000});
+  });
+
+  $("#f").addEventListener("submit", async e => {
+    e.preventDefault();
+    const nom = $("#spot").value.trim();
+    if(!nom){ toast("Donne un nom au spot"); $("#spot").focus(); return; }
+
+    // spot connu → on récupère ses coordonnées si on n'a pas relevé
+    let spot = D.spots.find(s => s.nom.toLowerCase() === nom.toLowerCase());
+    if(lat == null && spot){ lat = spot.lat; lon = spot.lon; }
+    if(!spot){ spot = {nom, lat, lon}; D.spots.push(spot); }
+    else if(lat != null && spot.lat == null){ spot.lat = lat; spot.lon = lon; }
+
+    const quand = new Date($("#quand").value || Date.now()).toISOString();
+    const s = {
+      id: id(), quand, spot: nom, lat, lon,
+      eau: $("#eau").value,
+      duree: $("#duree").value ? parseFloat($("#duree").value) : null,
+      technique: $("#tech").value,
+      couche: $("#couche").value,
+      leurre: $("#leurre").value.trim(),
+      coloris: $("#coloris").value.trim(),
+      eauCouleur: $("#eauCouleur").value,
+      nb: parseInt($("#nb").value || "0", 10),
+      espece: $("#espece").value,
+      taille: $("#taille").value ? parseInt($("#taille").value,10) : null,
+      notes: $("#notes").value.trim(),
+      meteo: null
+    };
+
+    const bouton = $(".principal");
+    bouton.disabled = true; bouton.textContent = "Enregistrement…";
+
+    if(lat != null){
+      try{ s.meteo = await chercherMeteo(lat, lon, quand); }catch(err){ /* file d'attente */ }
+    }
+    D.sorties.unshift(s);
+    const ok = ecrire(D);
+    bouton.disabled = false;
+
+    toast(ok ? (s.meteo ? "Sortie enregistrée" : "Enregistrée — météo en attente") : "Enregistrée en mémoire seulement");
+    aller("journal");
+  });
+}
+
+function spotLePlusProche(lat, lon, metres){
+  let best = null, bestD = Infinity;
+  for(const s of D.spots){
+    if(s.lat == null) continue;
+    const dx = (s.lon - lon) * 111320 * Math.cos(lat*Math.PI/180);
+    const dy = (s.lat - lat) * 110540;
+    const d = Math.hypot(dx, dy);
+    if(d < bestD){ bestD = d; best = s; }
+  }
+  return bestD <= metres ? best : null;
+}
+
+/* ══════════ vue : journal ══════════ */
+function carteSortie(s, match){
+  const m = s.meteo;
+  const f = m ? fleche(m.tendance) : null;
+  const strip = m ? `<div class="mini" style="margin-top:9px">
+      ${m.pression!=null?Math.round(m.pression)+" hPa":"—"}
+      <span class="tendance ${f.c}">${f.s}</span>
+      · ${m.temp!=null?m.temp.toFixed(1)+" °C":"—"}
+      · ${cardinal(m.ventDeg)} ${m.vent!=null?Math.round(m.vent):"—"} km/h
+      · ${m.nuages!=null?Math.round(m.nuages):"—"} %
+      ${m.lune?" · "+m.lune.glyphe:""}
+    </div>` : `<div class="mini" style="margin-top:9px">météo en attente</div>`;
+
+  const barre = match != null ? `<div class="match">
+      <span class="pct">${Math.round(match*100)} %</span>
+      <span class="barre"><i style="width:${Math.round(match*100)}%"></i></span>
+    </div>` : "";
+
+  return `<article class="carte">
+    <div class="carte-entete">
+      <div>
+        <h3>${ech(s.spot)}</h3>
+        <div class="quand">${joliDate(s.quand)}</div>
+      </div>
+      <span class="prise ${s.nb>0?"oui":"non"}">${s.nb>0 ? s.nb + (s.espece?" "+ech(s.espece).toLowerCase():" prise"+(s.nb>1?"s":"")) : "bredouille"}${s.nb>0&&s.taille?" · "+s.taille+" cm":""}</span>
+    </div>
+    <p class="detail">${ech(s.technique)}<span class="sep">/</span>${ech(s.couche).toLowerCase()}${s.leurre?`<span class="sep">/</span>${ech(s.leurre)}`:""}${s.coloris?" — "+ech(s.coloris):""}</p>
+    <div class="mini">${ech(s.eau)} · eau ${ech(s.eauCouleur).toLowerCase()}${s.duree?" · "+s.duree+" h":""}</div>
+    ${strip}
+    ${s.notes?`<p class="note">${ech(s.notes)}</p>`:""}
+    ${barre}
+    <div style="margin-top:10px"><button class="fantome" data-suppr="${s.id}">Supprimer</button></div>
+  </article>`;
+}
+
+function vueJournal(){
+  $("#titre").textContent = "Journal";
+  const n = D.sorties.length;
+  const prises = D.sorties.reduce((a,s)=>a+(s.nb||0),0);
+  $("#soustitre").textContent = n ? `${n} sortie${n>1?"s":""} · ${prises} prise${prises>1?"s":""}` : "";
+
+  if(!n){
+    vue.innerHTML = `<div class="vide">
+      <strong>Aucune sortie enregistrée</strong>
+      Le carnet ne sert à rien tant qu'il est vide — et les bredouilles comptent autant que les prises.
+      <div class="outils"><button id="versSortie">Enregistrer la première</button></div>
+      <div class="outils"><button class="fantome" id="importer">Importer une sauvegarde</button></div>
+    </div>`;
+    $("#versSortie").onclick = ()=>aller("sortie");
+    $("#importer").onclick = importerJSON;
+    return;
+  }
+
+  vue.innerHTML = D.sorties.map(s=>carteSortie(s)).join("") + `
+    <div class="outils">
+      <button id="exporter">Exporter (JSON)</button>
+      <button class="fantome" id="importer">Importer</button>
+    </div>
+    <p class="mini" style="margin-top:10px;line-height:1.6">
+      Les données vivent uniquement dans ce navigateur. Exporte de temps en temps —
+      un cache vidé ou un changement de téléphone efface tout.
+    </p>`;
+
+  $("#exporter").onclick = exporterJSON;
+  $("#importer").onclick = importerJSON;
+  vue.querySelectorAll("[data-suppr]").forEach(b=>{
+    b.onclick = () => {
+      if(!confirm("Supprimer cette sortie ?")) return;
+      D.sorties = D.sorties.filter(x=>x.id !== b.dataset.suppr);
+      ecrire(D); rendre(); toast("Sortie supprimée");
+    };
+  });
+}
+
+/* ══════════ vue : analyse ══════════ */
+function scoreSimilarite(cible, s){
+  const m = s.meteo; if(!m) return null;
+  let somme = 0, poids = 0;
+  const add = (ecart, tolerance, p) => {
+    if(ecart == null || isNaN(ecart)) return;
+    somme += p * Math.max(0, 1 - Math.abs(ecart)/tolerance); poids += p;
+  };
+  add(sousTraire(cible.pression, m.pression), 14, 3);
+  add(sousTraire(cible.tendance, m.tendance), 6, 3);
+  add(sousTraire(cible.temp, m.temp), 10, 2);
+  add(sousTraire(cible.nuages, m.nuages), 65, 1);
+  add(sousTraire(cible.vent, m.vent), 22, 1);
+  const d = new Date(s.quand);
+  add(ecartJour(cible.doy, jourAnnee(d)), 50, 3);
+  add(ecartHeure(cible.heure, d.getHours() + d.getMinutes()/60), 5, 2);
+  if(!poids) return null;
+  let sc = somme/poids;
+  if(cible.spot && s.spot === cible.spot) sc = Math.min(1, sc * 1.12);
+  return sc;
+}
+function sousTraire(a,b){ return (a==null||b==null) ? null : a-b; }
+
+function vueAnalyse(){
+  $("#titre").textContent = "Analyse";
+  $("#soustitre").textContent = "Ce qui a marché dans des conditions comme aujourd'hui.";
+
+  const utilisables = D.sorties.filter(s=>s.meteo);
+  if(utilisables.length < 3){
+    vue.innerHTML = `<div class="vide">
+      <strong>Pas encore assez de matière</strong>
+      Il faut au moins trois sorties avec météo pour comparer quoi que ce soit.
+      Actuellement : ${utilisables.length}.
+      <div class="outils"><button id="versSortie">Enregistrer une sortie</button></div>
+    </div>` + blocStats();
+    const b = $("#versSortie"); if(b) b.onclick = ()=>aller("sortie");
+    return;
+  }
+
+  vue.innerHTML = `
+    <div class="champ">
+      <label for="spotA">Spot visé</label>
+      <select id="spotA">
+        <option value="">Tous les spots</option>
+        ${D.spots.filter(s=>s.lat!=null).map(s=>`<option value="${ech(s.nom)}">${ech(s.nom)}</option>`).join("")}
+      </select>
+    </div>
+    <button class="principal" id="lancer">Relever les conditions du moment</button>
+    <div id="resultat" style="margin-top:20px"></div>` + blocStats();
+
+  $("#lancer").onclick = async () => {
+    const res = $("#resultat");
+    const nomSpot = $("#spotA").value;
+    const b = $("#lancer"); b.disabled = true; b.textContent = "Relevé en cours…";
+
+    try{
+      let lat, lon;
+      const spot = D.spots.find(s=>s.nom===nomSpot);
+      if(spot && spot.lat != null){ lat = spot.lat; lon = spot.lon; }
+      else {
+        const p = await new Promise((ok,ko)=>navigator.geolocation.getCurrentPosition(ok,ko,{timeout:12000}));
+        lat = p.coords.latitude; lon = p.coords.longitude;
+      }
+      const maintenant = new Date();
+      const m = await chercherMeteo(lat, lon, maintenant.toISOString());
+      const cible = {
+        pression:m.pression, tendance:m.tendance, temp:m.temp, nuages:m.nuages, vent:m.vent,
+        doy:jourAnnee(maintenant), heure:maintenant.getHours()+maintenant.getMinutes()/60,
+        spot:nomSpot || null
+      };
+
+      const classees = utilisables
+        .map(s=>({s, sc:scoreSimilarite(cible, s)}))
+        .filter(x=>x.sc != null)
+        .sort((a,b)=>b.sc - a.sc)
+        .slice(0,6);
+
+      const avecPrise = classees.filter(x=>x.s.nb>0);
+      const resume = avecPrise.length
+        ? `${avecPrise.length} des ${classees.length} sorties les plus proches ont donné du poisson.`
+        : `Aucune des sorties comparables n'a donné de poisson — ce n'est pas forcément un mauvais signe, c'est peut-être juste un créneau que tu as peu pêché.`;
+
+      res.innerHTML = bandeauInstrument(m, "Conditions maintenant · " + (nomSpot || "position actuelle"))
+        + `<p class="detail" style="margin-bottom:16px">${ech(resume)}</p>`
+        + `<h2 class="sec">Sorties les plus comparables</h2>`
+        + classees.map(x=>carteSortie(x.s, x.sc)).join("");
+
+      res.querySelectorAll("[data-suppr]").forEach(bt => bt.style.display = "none");
+    }catch(err){
+      res.innerHTML = `<div class="bandeau avert">Relevé impossible : ${ech(err.message || err)}. Vérifie le réseau et l'autorisation de position.</div>`;
+    }
+    b.disabled = false; b.textContent = "Relever les conditions du moment";
+  };
+}
+
+function blocStats(){
+  const S = D.sorties;
+  if(S.length < 2) return "";
+  const parCle = (fn) => {
+    const map = {};
+    for(const s of S){
+      const k = fn(s); if(!k) continue;
+      map[k] = map[k] || {n:0, prises:0};
+      map[k].n++; map[k].prises += (s.nb||0);
+    }
+    return Object.entries(map).sort((a,b)=>(b[1].prises/b[1].n)-(a[1].prises/a[1].n));
+  };
+  const rang = (titre, liste, min) => {
+    const f = liste.filter(([,v])=>v.n >= min);
+    if(!f.length) return "";
+    return `<h2 class="sec">${titre}</h2>` + f.slice(0,5).map(([k,v])=>
+      `<div class="stat"><span>${ech(k)} <span class="mini">· ${v.n} sortie${v.n>1?"s":""}</span></span><b>${(v.prises/v.n).toFixed(1)} / sortie</b></div>`
+    ).join("");
+  };
+  const total = S.reduce((a,s)=>a+(s.nb||0),0);
+  const bredouilles = S.filter(s=>!s.nb).length;
+  return `<h2 class="sec">Vue d'ensemble</h2>
+    <div class="stat"><span>Sorties</span><b>${S.length}</b></div>
+    <div class="stat"><span>Prises</span><b>${total}</b></div>
+    <div class="stat"><span>Bredouilles</span><b>${Math.round(bredouilles/S.length*100)} %</b></div>`
+    + rang("Par technique", parCle(s=>s.technique), 2)
+    + rang("Par leurre", parCle(s=>s.leurre), 2)
+    + rang("Par spot", parCle(s=>s.spot), 2);
+}
+
+/* ══════════ export / import ══════════ */
+function exporterJSON(){
+  const blob = new Blob([JSON.stringify(D, null, 2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "sonde-" + new Date().toISOString().slice(0,10) + ".json";
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+  toast("Sauvegarde exportée");
+}
+function importerJSON(){
+  const i = document.createElement("input");
+  i.type = "file"; i.accept = "application/json,.json";
+  i.onchange = () => {
+    const f = i.files[0]; if(!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try{
+        const j = JSON.parse(r.result);
+        if(!Array.isArray(j.sorties)) throw new Error("format inattendu");
+        const connus = new Set(D.sorties.map(s=>s.id));
+        const nouvelles = j.sorties.filter(s=>!connus.has(s.id));
+        D.sorties = [...nouvelles, ...D.sorties].sort((a,b)=>new Date(b.quand)-new Date(a.quand));
+        const nomsSpots = new Set(D.spots.map(s=>s.nom));
+        (j.spots||[]).forEach(s=>{ if(!nomsSpots.has(s.nom)) D.spots.push(s); });
+        ecrire(D); rendre();
+        toast(nouvelles.length + " sortie(s) importée(s)");
+      }catch(e){ toast("Fichier illisible"); }
+    };
+    r.readAsText(f);
+  };
+  i.click();
+}
+
+/* ══════════ navigation ══════════ */
+function aller(v){ vueActive = v; rendre(); window.scrollTo(0,0); }
+function rendre(){
+  document.querySelectorAll("nav button").forEach(b =>
+    b.setAttribute("aria-current", b.dataset.vue === vueActive ? "page" : "false"));
+  ({sortie:vueSortie, journal:vueJournal, analyse:vueAnalyse})[vueActive]();
+}
+document.querySelectorAll("nav button").forEach(b => b.onclick = () => aller(b.dataset.vue));
+
+rendre();
+completerMeteoEnAttente();
+
+if("serviceWorker" in navigator){
+  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}
+</script>
+</body>
+</html>
