@@ -23,6 +23,35 @@
   --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
   --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
   --nav:calc(58px + env(safe-area-inset-bottom));
+  --laiton-texte:#14202A;
+  --monte:#7FB8A0;
+  --descend:var(--laiton);
+  --ligne-motif:rgba(29,71,86,.28);
+  --nav-fond:rgba(8,25,31,.94);
+}
+html[data-theme="riviere"]{
+  --fond:#F4EFE4;--panneau:#FBF7EC;--panneau-haut:#F0E8D7;--ligne:#D8CBB0;
+  --texte:#2E3A2F;--doux:#76836D;--laiton:#B65A38;--laiton-sourd:#D8BF9F;
+  --alerte:#B23A26;--laiton-texte:#FBF6EC;--monte:#4F7A5C;--descend:#B65A38;
+  --mono:Georgia,"Palatino Linotype",Palatino,"Times New Roman","New York",serif;
+  --sans:Georgia,"Palatino Linotype",Palatino,"Times New Roman","New York",serif;
+  --ligne-motif:rgba(176,154,115,.22);--nav-fond:rgba(244,239,228,.95);
+}
+html[data-theme="eau"]{
+  --fond:#F2F6F3;--panneau:#FFFFFF;--panneau-haut:#EAF1EE;--ligne:#CFDED6;
+  --texte:#22332E;--doux:#6E8A80;--laiton:#2F6B5E;--laiton-sourd:#C1D7CE;
+  --alerte:#C2574A;--laiton-texte:#F4FAF7;--monte:#3E7A68;--descend:#C2574A;
+  --mono:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  --ligne-motif:rgba(120,158,144,.14);--nav-fond:rgba(242,246,243,.95);
+}
+html[data-theme="mouches"]{
+  --fond:#EFE7D3;--panneau:#F6EFDD;--panneau-haut:#E9DFC4;--ligne:#C9B98F;
+  --texte:#3A3529;--doux:#8A7B46;--laiton:#D9A441;--laiton-sourd:#C9B98F;
+  --alerte:#B0563A;--laiton-texte:#3A3529;--monte:#5B6B3C;--descend:#B0563A;
+  --mono:"New York",Georgia,"Palatino Linotype",Palatino,"Times New Roman",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  --ligne-motif:rgba(160,140,90,.16);--nav-fond:rgba(239,231,211,.95);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0}
@@ -34,7 +63,7 @@ body{
 /* ---- lignes de sonde : motif de fond ---- */
 body::before{
   content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
-  background:repeating-linear-gradient(to bottom,transparent 0 47px,rgba(29,71,86,.28) 47px 48px);
+  background:repeating-linear-gradient(to bottom,transparent 0 47px,var(--ligne-motif) 47px 48px);
   mask-image:linear-gradient(to bottom,transparent,#000 220px);
   -webkit-mask-image:linear-gradient(to bottom,transparent,#000 220px);
 }
@@ -86,7 +115,7 @@ input[type=number]{font-family:var(--mono)}
 button{cursor:pointer;border-radius:3px;border:1px solid var(--ligne);background:var(--panneau-haut);padding:11px 14px}
 button:active{transform:translateY(1px)}
 .principal{
-  width:100%;background:var(--laiton);color:#14202A;border:none;font-weight:700;
+  width:100%;background:var(--laiton);color:var(--laiton-texte);border:none;font-weight:700;
   padding:15px;letter-spacing:.02em;font-size:16.5px
 }
 .fantome{background:transparent;color:var(--doux);font-size:13.5px;padding:9px 11px}
@@ -100,7 +129,7 @@ button:active{transform:translateY(1px)}
 .instrument .u{color:var(--doux);font-size:11px}
 .instrument .abs{color:var(--doux);font-size:12.5px;font-style:normal}
 .tendance{font-weight:700}
-.monte{color:#7FB8A0}.descend{color:var(--laiton)}.stable{color:var(--doux)}
+.monte{color:var(--monte)}.descend{color:var(--descend)}.stable{color:var(--doux)}
 
 .carte{
   background:var(--panneau);border:1px solid var(--ligne);border-radius:3px;
@@ -113,7 +142,7 @@ button:active{transform:translateY(1px)}
   font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.06em;
   padding:3px 8px;border-radius:2px;white-space:nowrap
 }
-.prise.oui{background:var(--laiton);color:#14202A}
+.prise.oui{background:var(--laiton);color:var(--laiton-texte)}
 .prise.non{background:transparent;color:var(--doux);border:1px solid var(--ligne)}
 .detail{font-size:14px;color:var(--texte);margin:0 0 6px}
 .detail .sep{color:var(--doux);margin:0 6px}
@@ -133,7 +162,7 @@ button:active{transform:translateY(1px)}
 
 nav{
   position:fixed;bottom:0;left:0;right:0;z-index:5;display:flex;
-  background:rgba(8,25,31,.94);backdrop-filter:blur(12px);
+  background:var(--nav-fond);backdrop-filter:blur(12px);
   border-top:1px solid var(--ligne);padding-bottom:env(safe-area-inset-bottom)
 }
 nav button{
@@ -146,17 +175,26 @@ nav button[aria-current=page]{color:var(--laiton);box-shadow:inset 0 2px 0 var(-
   font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;padding:9px 12px;
   border-radius:3px;margin-bottom:14px;border:1px solid
 }
-.bandeau.avert{background:rgba(196,87,63,.12);border-color:rgba(196,87,63,.5);color:#E9A392}
-.bandeau.info{background:rgba(200,155,84,.09);border-color:var(--laiton-sourd);color:var(--laiton)}
+.bandeau.avert{background:rgba(196,87,63,.12);border-color:rgba(196,87,63,.5);color:var(--alerte)}
+.bandeau.info{background:rgba(200,155,84,.16);border-color:var(--laiton-sourd);color:var(--texte)}
 
 .toast{
   position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--nav) + 14px);z-index:20;
-  background:var(--laiton);color:#14202A;font-family:var(--mono);font-size:12.5px;letter-spacing:.05em;
+  background:var(--laiton);color:var(--laiton-texte);font-family:var(--mono);font-size:12.5px;letter-spacing:.05em;
   padding:11px 17px;border-radius:3px;font-weight:700;opacity:0;transition:opacity .2s;pointer-events:none
 }
 .toast.on{opacity:1}
 .outils{display:flex;gap:9px;margin:20px 0 4px}
 .outils button{flex:1}
+.themes{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:2px}
+.theme{
+  display:flex;flex-direction:column;align-items:flex-start;gap:8px;
+  background:var(--panneau);border:1px solid var(--ligne);border-radius:3px;padding:11px 12px
+}
+.theme.sel{border-color:var(--laiton);box-shadow:inset 0 0 0 1px var(--laiton)}
+.theme .pastilles{display:flex;gap:5px}
+.theme .pastilles i{width:17px;height:17px;border-radius:50%;border:1px solid rgba(0,0,0,.14)}
+.theme .t-nom{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--texte)}
 h2.sec{
   font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
   color:var(--doux);margin:26px 0 11px;padding-bottom:7px;border-bottom:1px solid var(--ligne)
@@ -216,6 +254,30 @@ function ecrire(d){
 })();
 
 let D = lire();
+
+/* ══════════ thème ══════════ */
+const CLE_THEME = "sonde.theme";
+const THEMES = [
+  {id:"sonde",   nom:"Sonde nuit",       pastilles:["#08191F","#C89B54"], meta:"#08191F"},
+  {id:"riviere", nom:"Carnet de rivière",pastilles:["#F4EFE4","#B65A38","#7A8B6F"], meta:"#F4EFE4"},
+  {id:"eau",     nom:"Au bord de l'eau", pastilles:["#F2F6F3","#2F6B5E","#CFDED6"], meta:"#F2F6F3"},
+  {id:"mouches", nom:"Boîte à mouches",  pastilles:["#EFE7D3","#D9A441","#5B6B3C"], meta:"#EFE7D3"}
+];
+let theme = lireTheme();
+function lireTheme(){
+  try{
+    const t = localStorage.getItem(CLE_THEME);
+    if(THEMES.some(x=>x.id===t)) return t;
+  }catch(e){}
+  return "sonde";
+}
+function appliquerTheme(t){
+  document.documentElement.dataset.theme = t;
+  const m = THEMES.find(x=>x.id===t);
+  const meta = document.querySelector("meta[name=theme-color]");
+  if(m && meta) meta.content = m.meta;
+}
+appliquerTheme(theme);
 
 /* ══════════ utilitaires ══════════ */
 const $ = s => document.querySelector(s);
@@ -609,6 +671,8 @@ function vueJournal(){
     </div>`;
     $("#versSortie").onclick = ()=>aller("sortie");
     $("#importer").onclick = importerJSON;
+    vue.innerHTML += blocTheme();
+    lierTheme();
     return;
   }
 
@@ -620,7 +684,7 @@ function vueJournal(){
     <p class="mini" style="margin-top:10px;line-height:1.6">
       Les données vivent uniquement dans ce navigateur. Exporte de temps en temps —
       un cache vidé ou un changement de téléphone efface tout.
-    </p>`;
+    </p>` + blocTheme();
 
   $("#exporter").onclick = exporterJSON;
   $("#importer").onclick = importerJSON;
@@ -631,6 +695,8 @@ function vueJournal(){
       ecrire(D); rendre(); toast("Sortie supprimée");
     };
   });
+
+  lierTheme();
 }
 
 /* ══════════ vue : analyse ══════════ */
@@ -756,6 +822,24 @@ function blocStats(){
     + rang("Par technique", parCle(s=>s.technique), 2)
     + rang("Par leurre", parCle(s=>s.leurre), 2)
     + rang("Par spot", parCle(s=>s.spot), 2);
+}
+
+/* ══════════ habillage ══════════ */
+function blocTheme(){
+  return `<h2 class="sec">Habillage</h2>
+    <div class="themes">` + THEMES.map(t =>
+      `<button type="button" class="theme${t.id===theme?" sel":""}" data-theme-sel="${t.id}">
+        <span class="pastilles">${t.pastilles.map(c=>`<i style="background:${c}"></i>`).join("")}</span>
+        <span class="t-nom">${ech(t.nom)}</span>
+      </button>`).join("") + `</div>`;
+}
+function lierTheme(){
+  vue.querySelectorAll("[data-theme-sel]").forEach(b => b.onclick = () => {
+    theme = b.dataset.themeSel;
+    appliquerTheme(theme);
+    try{ localStorage.setItem(CLE_THEME, theme); }catch(e){}
+    vue.querySelectorAll("[data-theme-sel]").forEach(x=>x.classList.toggle("sel", x===b));
+  });
 }
 
 /* ══════════ export / import ══════════ */
