@@ -61,7 +61,27 @@ input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid v
 input[type=number]{font-family:var(--mono)}
 .champ{margin-bottom:15px}
 .duo{display:grid;grid-template-columns:1fr 1fr;gap:11px}
-.trio{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px}
+.resultats-entete,.resultat-ligne{
+  display:grid;grid-template-columns:.72fr 1.15fr .72fr 38px;gap:8px;align-items:center
+}
+.resultats-entete{margin-bottom:6px}
+.resultats-entete span{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--doux)
+}
+.resultat-ligne{margin-bottom:9px}
+.resultat-ligne input,.resultat-ligne select{min-width:0;padding-left:10px;padding-right:10px}
+.resultat-ligne select{padding-right:27px}
+.suppr-resultat{
+  width:38px;height:44px;padding:0;background:transparent;color:var(--doux);
+  border-color:var(--ligne);font-size:21px;line-height:1
+}
+.resultat-ligne:only-child .suppr-resultat{visibility:hidden}
+.ajouter-resultat{margin-top:2px;color:var(--laiton);background:transparent;border-color:var(--laiton-sourd)}
+.details-prises{
+  margin:9px 0 6px;padding:8px 10px;border-left:2px solid var(--laiton-sourd);
+  font-family:var(--mono);font-size:11.5px;color:var(--texte);line-height:1.65
+}
 
 button{cursor:pointer;border-radius:3px;border:1px solid var(--ligne);background:var(--panneau-haut);padding:11px 14px}
 button:active{transform:translateY(1px)}
@@ -342,6 +362,34 @@ function opts(liste, choisi){
   return liste.map(o => `<option value="${ech(o)}"${o===choisi?" selected":""}>${ech(o)}</option>`).join("");
 }
 
+function ligneResultatHTML(r, nbDefaut){
+  r = r || {};
+  const nb = Number.isFinite(Number(r.nb)) ? Math.max(0, parseInt(r.nb,10) || 0) : (nbDefaut || 0);
+  const taille = Number.isFinite(Number(r.taille)) && Number(r.taille) > 0 ? parseInt(r.taille,10) : "";
+  return `<div class="resultat-ligne">
+    <input class="res-nb" type="number" min="0" value="${nb}" aria-label="Nombre de prises">
+    <select class="res-espece" aria-label="Espèce"><option value="">—</option>${opts(ESPECES, r.espece || "")}</select>
+    <input class="res-taille" type="number" min="0" value="${taille}" aria-label="Taille maximale en centimètres">
+    <button type="button" class="suppr-resultat" aria-label="Retirer cette espèce">×</button>
+  </div>`;
+}
+
+function resultatsSortie(s){
+  if(Array.isArray(s.resultats)){
+    return s.resultats.map(r => ({
+      nb: Math.max(0, parseInt(r.nb,10) || 0),
+      espece: String(r.espece || ""),
+      taille: r.taille ? Math.max(0, parseInt(r.taille,10) || 0) : null
+    })).filter(r => r.nb > 0);
+  }
+  const nb = Math.max(0, parseInt(s.nb,10) || 0);
+  return nb > 0 ? [{nb, espece:String(s.espece || ""), taille:s.taille ? Math.max(0, parseInt(s.taille,10) || 0) : null}] : [];
+}
+
+function totalPrises(s){
+  return resultatsSortie(s).reduce((total,r) => total + r.nb, 0);
+}
+
 /* ══════════ vue : nouvelle sortie ══════════ */
 function vueSortie(){
   $("#titre").textContent = "Nouvelle sortie";
@@ -389,10 +437,12 @@ function vueSortie(){
     </div>
 
     <h2 class="sec">Résultat</h2>
-    <div class="trio champ">
-      <div><label for="nb">Prises</label><input type="number" id="nb" min="0" value="0"></div>
-      <div><label for="espece">Espèce</label><select id="espece"><option value="">—</option>${opts(ESPECES)}</select></div>
-      <div><label for="taille">Max (cm)</label><input type="number" id="taille" min="0" placeholder=""></div>
+    <div class="champ">
+      <div class="resultats-entete" aria-hidden="true">
+        <span>Prises</span><span>Espèce</span><span>Max (cm)</span><span></span>
+      </div>
+      <div id="resultats">${ligneResultatHTML(null, 0)}</div>
+      <button type="button" id="ajouterResultat" class="ajouter-resultat">＋ Ajouter une espèce</button>
     </div>
     <div class="champ">
       <label for="notes">Notes</label>
@@ -403,6 +453,18 @@ function vueSortie(){
   </form>`;
 
   let lat = null, lon = null;
+
+  const brancherSuppressions = () => {
+    vue.querySelectorAll(".suppr-resultat").forEach(b => {
+      b.onclick = () => b.closest(".resultat-ligne").remove();
+    });
+  };
+  brancherSuppressions();
+  $("#ajouterResultat").onclick = () => {
+    $("#resultats").insertAdjacentHTML("beforeend", ligneResultatHTML(null, 1));
+    brancherSuppressions();
+    vue.querySelector(".resultat-ligne:last-child .res-espece").focus();
+  };
 
   $("#geo").addEventListener("click", () => {
     const info = $("#posInfo");
@@ -429,6 +491,21 @@ function vueSortie(){
     if(!spot){ spot = {nom, lat, lon}; D.spots.push(spot); }
     else if(lat != null && spot.lat == null){ spot.lat = lat; spot.lon = lon; }
 
+    const lignesResultat = [...vue.querySelectorAll(".resultat-ligne")].map(ligne => ({
+      nb: Math.max(0, parseInt(ligne.querySelector(".res-nb").value,10) || 0),
+      espece: ligne.querySelector(".res-espece").value,
+      taille: ligne.querySelector(".res-taille").value ? Math.max(0, parseInt(ligne.querySelector(".res-taille").value,10) || 0) : null
+    }));
+    if(lignesResultat.some(r => r.nb > 0 && !r.espece)){
+      toast("Choisis l’espèce pour chaque prise"); return;
+    }
+    if(lignesResultat.some(r => r.nb === 0 && (r.espece || r.taille))){
+      toast("Indique le nombre de prises"); return;
+    }
+    const resultats = lignesResultat.filter(r => r.nb > 0);
+    const nbTotal = resultats.reduce((total,r) => total + r.nb, 0);
+    const tailles = resultats.map(r=>r.taille).filter(t=>t>0);
+
     const quand = new Date($("#quand").value || Date.now()).toISOString();
     const s = {
       id: id(), quand, spot: nom, lat, lon,
@@ -439,9 +516,11 @@ function vueSortie(){
       leurre: $("#leurre").value.trim(),
       coloris: $("#coloris").value.trim(),
       eauCouleur: $("#eauCouleur").value,
-      nb: parseInt($("#nb").value || "0", 10),
-      espece: $("#espece").value,
-      taille: $("#taille").value ? parseInt($("#taille").value,10) : null,
+      resultats,
+      // Champs conservés pour les sauvegardes et anciennes versions de Sonde.
+      nb: nbTotal,
+      espece: resultats.length === 1 ? resultats[0].espece : "",
+      taille: tailles.length ? Math.max(...tailles) : null,
       notes: $("#notes").value.trim(),
       meteo: null
     };
@@ -476,6 +555,8 @@ function spotLePlusProche(lat, lon, metres){
 /* ══════════ vue : journal ══════════ */
 function carteSortie(s, match){
   const m = s.meteo;
+  const resultats = resultatsSortie(s);
+  const nbTotal = totalPrises(s);
   const f = m ? fleche(m.tendance) : null;
   const strip = m ? `<div class="mini" style="margin-top:9px">
       ${m.pression!=null?Math.round(m.pression)+" hPa":"—"}
@@ -491,14 +572,19 @@ function carteSortie(s, match){
       <span class="barre"><i style="width:${Math.round(match*100)}%"></i></span>
     </div>` : "";
 
+  const detailsPrises = resultats.length ? `<div class="details-prises">${resultats.map(r =>
+    `<div>${r.nb} × ${ech(r.espece || "espèce non renseignée")}${r.taille ? ` · max ${r.taille} cm` : ""}</div>`
+  ).join("")}</div>` : "";
+
   return `<article class="carte">
     <div class="carte-entete">
       <div>
         <h3>${ech(s.spot)}</h3>
         <div class="quand">${joliDate(s.quand)}</div>
       </div>
-      <span class="prise ${s.nb>0?"oui":"non"}">${s.nb>0 ? s.nb + (s.espece?" "+ech(s.espece).toLowerCase():" prise"+(s.nb>1?"s":"")) : "bredouille"}${s.nb>0&&s.taille?" · "+s.taille+" cm":""}</span>
+      <span class="prise ${nbTotal>0?"oui":"non"}">${nbTotal>0 ? nbTotal + " prise" + (nbTotal>1?"s":"") : "bredouille"}</span>
     </div>
+    ${detailsPrises}
     <p class="detail">${ech(s.technique)}<span class="sep">/</span>${ech(s.couche).toLowerCase()}${s.leurre?`<span class="sep">/</span>${ech(s.leurre)}`:""}${s.coloris?" — "+ech(s.coloris):""}</p>
     <div class="mini">${ech(s.eau)} · eau ${ech(s.eauCouleur).toLowerCase()}${s.duree?" · "+s.duree+" h":""}</div>
     ${strip}
@@ -511,7 +597,7 @@ function carteSortie(s, match){
 function vueJournal(){
   $("#titre").textContent = "Journal";
   const n = D.sorties.length;
-  const prises = D.sorties.reduce((a,s)=>a+(s.nb||0),0);
+  const prises = D.sorties.reduce((a,s)=>a+totalPrises(s),0);
   $("#soustitre").textContent = n ? `${n} sortie${n>1?"s":""} · ${prises} prise${prises>1?"s":""}` : "";
 
   if(!n){
@@ -624,7 +710,7 @@ function vueAnalyse(){
         .sort((a,b)=>b.sc - a.sc)
         .slice(0,6);
 
-      const avecPrise = classees.filter(x=>x.s.nb>0);
+      const avecPrise = classees.filter(x=>totalPrises(x.s)>0);
       const resume = avecPrise.length
         ? `${avecPrise.length} des ${classees.length} sorties les plus proches ont donné du poisson.`
         : `Aucune des sorties comparables n'a donné de poisson — ce n'est pas forcément un mauvais signe, c'est peut-être juste un créneau que tu as peu pêché.`;
@@ -650,7 +736,7 @@ function blocStats(){
     for(const s of S){
       const k = fn(s); if(!k) continue;
       map[k] = map[k] || {n:0, prises:0};
-      map[k].n++; map[k].prises += (s.nb||0);
+      map[k].n++; map[k].prises += totalPrises(s);
     }
     return Object.entries(map).sort((a,b)=>(b[1].prises/b[1].n)-(a[1].prises/a[1].n));
   };
@@ -661,8 +747,8 @@ function blocStats(){
       `<div class="stat"><span>${ech(k)} <span class="mini">· ${v.n} sortie${v.n>1?"s":""}</span></span><b>${(v.prises/v.n).toFixed(1)} / sortie</b></div>`
     ).join("");
   };
-  const total = S.reduce((a,s)=>a+(s.nb||0),0);
-  const bredouilles = S.filter(s=>!s.nb).length;
+  const total = S.reduce((a,s)=>a+totalPrises(s),0);
+  const bredouilles = S.filter(s=>totalPrises(s)===0).length;
   return `<h2 class="sec">Vue d'ensemble</h2>
     <div class="stat"><span>Sorties</span><b>${S.length}</b></div>
     <div class="stat"><span>Prises</span><b>${total}</b></div>

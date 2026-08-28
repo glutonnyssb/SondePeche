@@ -5,6 +5,9 @@ L'appli va chercher toute seule la pression, sa tendance sur 6 h, la températur
 couverture nuageuse et la phase lunaire à partir du GPS et de l'horodatage. Ensuite elle compare
 les conditions du moment à tes sorties passées.
 
+Une sortie peut contenir plusieurs lignes de résultat : indique séparément le nombre, l'espèce et
+la taille maximale pour chaque type de poisson pris.
+
 Tout tourne côté navigateur. Aucun serveur, aucun compte, aucune donnée qui sort de ton téléphone
 (à part les coordonnées envoyées à Open-Meteo pour la météo).
 
