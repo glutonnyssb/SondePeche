@@ -1,6 +1,6 @@
 {
-  "name": "Sonde — carnet de pêche",
-  "short_name": "Sonde",
+  "name": "Rivage — carnet de pêche",
+  "short_name": "Rivage",
   "description": "Carnet de sorties de pêche : conditions relevées automatiquement, comparaison avec les sorties passées.",
   "start_url": "./index.html",
   "scope": "./",

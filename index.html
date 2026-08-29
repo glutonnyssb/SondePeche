@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#08191F">
-<title>Sonde — carnet de pêche</title>
+<title>Rivage — carnet de pêche</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -218,7 +218,7 @@ h2.sec::after{content:"";flex:1;height:1px;background:var(--ligne)}
     <div>
       <div class="marque">
         <svg viewBox="0 0 48 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10c0-3.2 3-5.4 7-5.4 3 0 6 1.6 8 3.4 1.2 1 1.2 2.6 0 3.6-2 1.8-5 3.4-8 3.4-4 0-7-2.2-7-5z"/><path d="M21 10l5-3-1.4 3L26 13l-5-3z"/><circle cx="9" cy="9.4" r=".7" fill="currentColor"/></svg>
-        <span>Sonde</span>
+        <span>Rivage</span>
       </div>
       <h1 class="vue-titre" id="titre">Nouvelle sortie</h1>
       <p class="sous" id="soustitre"></p>
@@ -269,7 +269,7 @@ let D = lire();
 /* ══════════ thème ══════════ */
 const CLE_THEME = "sonde.theme";
 const THEMES = [
-  {id:"sonde",   nom:"Sonde nuit",       pastilles:["#08191F","#C89B54"], meta:"#08191F"},
+  {id:"sonde",   nom:"Nuit",            pastilles:["#08191F","#C89B54"], meta:"#08191F"},
   {id:"riviere", nom:"Carnet de rivière",pastilles:["#F4EFE4","#B65A38","#7A8B6F"], meta:"#F4EFE4"},
   {id:"eau",     nom:"Au bord de l'eau", pastilles:["#F2F6F3","#2F6B5E","#CFDED6"], meta:"#F2F6F3"},
   {id:"mouches", nom:"Boîte à mouches",  pastilles:["#EFE7D3","#D9A441","#5B6B3C"], meta:"#EFE7D3"}
@@ -466,7 +466,7 @@ function totalPrises(s){
 /* ══════════ vue : nouvelle sortie ══════════ */
 function vueSortie(){
   $("#titre").textContent = "Nouvelle sortie";
-  $("#soustitre").textContent = "Trente secondes, même bredouille.";
+  $("#soustitre").textContent = "";
 
   const avert = !persistant
     ? `<div class="bandeau avert">Stockage indisponible ici — les sorties ne seront pas conservées. Déploie la page en ligne pour l'utiliser pour de vrai.</div>` : "";
@@ -590,7 +590,7 @@ function vueSortie(){
       coloris: $("#coloris").value.trim(),
       eauCouleur: $("#eauCouleur").value,
       resultats,
-      // Champs conservés pour les sauvegardes et anciennes versions de Sonde.
+      // Champs conservés pour les sauvegardes et anciennes versions de Rivage.
       nb: nbTotal,
       espece: resultats.length === 1 ? resultats[0].espece : "",
       taille: tailles.length ? Math.max(...tailles) : null,
@@ -858,7 +858,7 @@ function exporterJSON(){
   const blob = new Blob([JSON.stringify(D, null, 2)], {type:"application/json"});
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = "sonde-" + new Date().toISOString().slice(0,10) + ".json";
+  a.download = "rivage-" + new Date().toISOString().slice(0,10) + ".json";
   a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
   toast("Sauvegarde exportée");

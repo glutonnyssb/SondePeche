@@ -1,6 +1,6 @@
 // Service worker : met l'application en cache pour qu'elle démarre sans réseau.
 // Change VERSION à chaque modification de index.html pour forcer la mise à jour.
-const VERSION = "sonde-5";
+const VERSION = "rivage-1";
 const COQUILLE = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", e => {

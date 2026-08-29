@@ -1,4 +1,4 @@
-# Sonde — carnet de pêche
+# Rivage — carnet de pêche
 
 Carnet de sorties personnel. Tu enregistres où, quand, comment tu as pêché et ce que ça a donné.
 L'appli va chercher toute seule la pression, sa tendance sur 6 h, la température, le vent, la
@@ -13,12 +13,12 @@ Tout tourne côté navigateur. Aucun serveur, aucun compte, aucune donnée qui s
 
 ## Mise en ligne sur GitHub Pages
 
-1. Crée un dépôt public sur GitHub, par exemple `sonde`.
+1. Crée un dépôt public sur GitHub, par exemple `rivage`.
 2. Dépose les cinq fichiers à la racine : `index.html`, `manifest.webmanifest`, `sw.js`,
    `icon-192.png`, `icon-512.png`, `icon-512-maskable.png`.
 3. Onglet **Settings → Pages**. Dans *Source*, choisis **Deploy from a branch**,
    branche `main`, dossier `/ (root)`. Enregistre.
-4. Une minute plus tard, l'adresse `https://<ton-pseudo>.github.io/sonde/` répond.
+4. Une minute plus tard, l'adresse `https://<ton-pseudo>.github.io/rivage/` répond.
 
 HTTPS est obligatoire pour le GPS et le mode hors-ligne — GitHub Pages le fournit d'office.
 
