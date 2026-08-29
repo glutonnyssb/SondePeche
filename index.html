@@ -27,9 +27,9 @@
   --monte:#7FB8A0;
   --descend:var(--laiton);
   --nav-fond:rgba(8,25,31,.94);
-  --rayon:14px;
-  --rayon-s:12px;
-  --ombre:0 2px 6px rgba(0,0,0,.2);
+  --rayon:18px;
+  --rayon-s:14px;
+  --ombre:0 5px 16px rgba(0,0,0,.14);
 }
 html[data-theme="riviere"]{
   --fond:#F4EFE4;--panneau:#FBF7EC;--panneau-haut:#F0E8D7;--ligne:#D8CBB0;
@@ -38,6 +38,7 @@ html[data-theme="riviere"]{
   --mono:Georgia,"Palatino Linotype",Palatino,"Times New Roman","New York",serif;
   --sans:Georgia,"Palatino Linotype",Palatino,"Times New Roman","New York",serif;
   --nav-fond:rgba(244,239,228,.95);
+  --rayon:20px;--rayon-s:15px;
 }
 html[data-theme="eau"]{
   --fond:#F2F6F3;--panneau:#FFFFFF;--panneau-haut:#EAF1EE;--ligne:#CFDED6;
@@ -46,6 +47,7 @@ html[data-theme="eau"]{
   --mono:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
   --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
   --nav-fond:rgba(242,246,243,.95);
+  --rayon:22px;--rayon-s:16px;--ombre:0 8px 22px rgba(38,70,63,.12);
 }
 html[data-theme="mouches"]{
   --fond:#EFE7D3;--panneau:#F6EFDD;--panneau-haut:#E9DFC4;--ligne:#C9B98F;
@@ -54,6 +56,7 @@ html[data-theme="mouches"]{
   --mono:"New York",Georgia,"Palatino Linotype",Palatino,"Times New Roman",serif;
   --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
   --nav-fond:rgba(239,231,211,.95);
+  --rayon:16px;--rayon-s:12px;--ombre:2px 2px 0 rgba(122,107,60,.15);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0}
@@ -64,10 +67,13 @@ body{
 }
 #app{max-width:560px;margin:0 auto;padding:0 16px}
 
-header.top{padding:22px 0 14px;display:flex;align-items:baseline;justify-content:space-between;gap:12px}
-.marque{font-family:var(--mono);font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--laiton)}
-.vue-titre{font-size:26px;font-weight:600;letter-spacing:-.02em;margin:0}
-.sous{color:var(--doux);font-size:13.5px;margin:2px 0 0}
+header.top{padding:26px 0 8px;display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.marque{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--laiton)}
+.marque svg{height:19px;width:auto;flex:none}
+.vague{color:var(--laiton);margin:-2px 0 6px}
+.vague svg{display:block;width:100%;height:20px}
+.vue-titre{font-size:28px;font-weight:650;letter-spacing:-.02em;margin:0}
+.sous{color:var(--doux);font-size:14px;margin:2px 0 0}
 
 label,.eyebrow{
   display:block;font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;
@@ -76,7 +82,7 @@ label,.eyebrow{
 input,select,textarea,button{font-family:inherit;font-size:16px;color:var(--texte)}
 input,select,textarea{
   width:100%;background:var(--panneau);border:1px solid var(--ligne);
-  border-radius:var(--rayon-s);padding:12px 13px;appearance:none
+  border-radius:var(--rayon-s);padding:13px 15px;appearance:none
 }
 select{
   background-image:linear-gradient(45deg,transparent 50%,var(--doux) 50%),linear-gradient(135deg,var(--doux) 50%,transparent 50%);
@@ -86,8 +92,8 @@ select{
 textarea{min-height:76px;resize:vertical}
 input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--laiton);outline-offset:1px}
 input[type=number]{font-family:var(--mono)}
-.champ{margin-bottom:15px}
-.duo{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.champ{margin-bottom:20px}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:13px}
 .resultats-entete,.resultat-ligne{
   display:grid;grid-template-columns:.72fr 1.15fr .72fr 38px;gap:8px;align-items:center
 }
@@ -104,7 +110,7 @@ input[type=number]{font-family:var(--mono)}
   border-color:var(--ligne);font-size:21px;line-height:1
 }
 .resultat-ligne:only-child .suppr-resultat{visibility:hidden}
-.ajouter-resultat{margin-top:2px;color:var(--laiton);background:transparent;border-color:var(--laiton-sourd)}
+.ajouter-resultat{margin-top:2px;color:var(--laiton);background:transparent;border-color:var(--laiton-sourd);border-radius:999px;padding:10px 18px}
 .details-prises{
   margin:9px 0 6px;padding:8px 10px;border-left:2px solid var(--laiton-sourd);
   font-family:var(--mono);font-size:11.5px;color:var(--texte);line-height:1.65
@@ -114,9 +120,9 @@ button{cursor:pointer;border-radius:var(--rayon-s);border:1px solid var(--ligne)
 button:active{transform:translateY(1px)}
 .principal{
   width:100%;background:var(--laiton);color:var(--laiton-texte);border:none;font-weight:700;
-  padding:15px;letter-spacing:.02em;font-size:16.5px
+  border-radius:999px;padding:16px 18px;letter-spacing:.02em;font-size:16.5px
 }
-.fantome{background:transparent;color:var(--doux);font-size:13.5px;padding:9px 11px}
+.fantome{background:transparent;color:var(--doux);font-size:13.5px;padding:10px 14px;border-radius:999px}
 
 /* ---- bandeau instrument : l'élément signature ---- */
 .instrument{
@@ -131,14 +137,14 @@ button:active{transform:translateY(1px)}
 
 .carte{
   background:var(--panneau);border:1px solid var(--ligne);border-radius:var(--rayon);
-  padding:14px;margin-bottom:11px;box-shadow:var(--ombre)
+  padding:16px;margin-bottom:12px;box-shadow:var(--ombre)
 }
 .carte-entete{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px}
 .carte h3{margin:0;font-size:16.5px;font-weight:600}
 .carte .quand{font-family:var(--mono);font-size:11.5px;color:var(--doux);letter-spacing:.04em}
 .prise{
   font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.06em;
-  padding:3px 9px;border-radius:8px;white-space:nowrap
+  padding:4px 12px;border-radius:999px;white-space:nowrap
 }
 .prise.oui{background:var(--laiton);color:var(--laiton-texte)}
 .prise.non{background:transparent;color:var(--doux);border:1px solid var(--ligne)}
@@ -148,13 +154,13 @@ button:active{transform:translateY(1px)}
 .note{font-size:13.5px;color:var(--doux);margin:8px 0 0;font-style:italic}
 
 /* barre de correspondance */
-.match{display:flex;align-items:center;gap:9px;margin-top:9px}
-.match .barre{flex:1;height:3px;background:var(--laiton-sourd);border-radius:2px;overflow:hidden}
+.match{display:flex;align-items:center;gap:9px;margin-top:12px}
+.match .barre{flex:1;height:4px;background:var(--laiton-sourd);border-radius:4px;overflow:hidden}
 .match .barre i{display:block;height:100%;background:var(--laiton)}
 .match .pct{font-family:var(--mono);font-size:11px;color:var(--laiton);letter-spacing:.05em}
 
 .vide{
-  border:1px dashed var(--ligne);border-radius:16px;padding:28px 18px;text-align:center;color:var(--doux)
+  border:1px dashed var(--ligne);border-radius:var(--rayon);padding:28px 18px;text-align:center;color:var(--doux)
 }
 .vide strong{display:block;color:var(--texte);font-size:17px;font-weight:600;margin-bottom:6px}
 
@@ -194,9 +200,12 @@ nav button[aria-current=page]{color:var(--laiton);box-shadow:inset 0 2px 0 var(-
 .theme .pastilles i{width:17px;height:17px;border-radius:50%;border:1px solid rgba(0,0,0,.14)}
 .theme .t-nom{font-family:var(--mono);font-size:12px;letter-spacing:.04em;color:var(--texte)}
 h2.sec{
-  font-family:var(--mono);font-size:12.5px;letter-spacing:.05em;
-  color:var(--doux);margin:26px 0 11px;padding-bottom:7px;border-bottom:1px solid var(--ligne)
+  display:flex;align-items:center;gap:10px;margin:32px 0 16px;
+  font-family:var(--sans);font-size:15.5px;font-weight:650;letter-spacing:.01em;color:var(--texte)
 }
+h2.sec::before{content:"";width:10px;height:10px;background:var(--laiton);flex:none;
+  transform:rotate(45deg);border-radius:2px}
+h2.sec::after{content:"";flex:1;height:1px;background:var(--ligne)}
 .stat{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--ligne);font-size:14.5px}
 .stat b{font-family:var(--mono);font-weight:700;color:var(--laiton)}
 .cache{display:none}
@@ -207,11 +216,15 @@ h2.sec{
 <div id="app">
   <header class="top">
     <div>
-      <div class="marque">Sonde</div>
+      <div class="marque">
+        <svg viewBox="0 0 48 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10c0-3.2 3-5.4 7-5.4 3 0 6 1.6 8 3.4 1.2 1 1.2 2.6 0 3.6-2 1.8-5 3.4-8 3.4-4 0-7-2.2-7-5z"/><path d="M21 10l5-3-1.4 3L26 13l-5-3z"/><circle cx="9" cy="9.4" r=".7" fill="currentColor"/></svg>
+        <span>Sonde</span>
+      </div>
       <h1 class="vue-titre" id="titre">Nouvelle sortie</h1>
       <p class="sous" id="soustitre"></p>
     </div>
   </header>
+  <div class="vague"><svg viewBox="0 0 1200 22" preserveAspectRatio="none" fill="none"><path d="M0 12 C60 2 120 22 180 12 S300 2 360 12 S480 22 540 12 S660 2 720 12 S840 22 900 12 S1020 2 1080 12 S1140 22 1200 12" stroke="currentColor" stroke-width="2" opacity=".34"/><path d="M0 17 C60 8 120 24 180 17 S300 8 360 17 S480 24 540 17 S660 8 720 17 S840 24 900 17 S1020 8 1080 17 S1140 24 1200 17" stroke="currentColor" stroke-width="1.4" opacity=".2"/></svg></div>
   <div id="vue"></div>
 </div>
 
